@@ -1,2 +1,5 @@
 target
+.snfoundry.toml
+.snfoundry_cache
+
 student-registry-dapp-starter
