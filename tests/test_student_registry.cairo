@@ -45,9 +45,9 @@ fn test_add_student() {
 
     student_registry_dispatcher.add_student('JK', account1, 20, 100, true);
 
-    let student1 = student_registry_dispatcher.get_student(account1);
+    let student1 = student_registry_dispatcher.get_student(0);
 
-    let (name, account, age, xp, active) = student1;
+    let (_id, name, account, age, xp, active) = student1;
 
     assert(name == 'JK', 'Name was not set correctly');
     assert(account == account1, 'Account was not set correctly');
@@ -66,9 +66,9 @@ fn test_get_student() {
 
     student_registry_dispatcher.add_student('John', account1, 20, 100, true);
 
-    let student1 = student_registry_dispatcher.get_student(account1);
+    let student1 = student_registry_dispatcher.get_student(0);
 
-    let (name, account, age, xp, active) = student1;
+    let (_id, name, account, age, xp, active) = student1;
 
     assert(name == 'John', 'Name was not set correctly');
     assert(account == account1, 'Account was not set correctly');
@@ -87,13 +87,13 @@ fn test_update_student() {
 
     student_registry_dispatcher.add_student('John', account1, 20, 100, true);
 
-    let result = student_registry_dispatcher.update_student('Jane', account1, 21, 101, false);
+    let result = student_registry_dispatcher.update_student(0, 'Jane', account1, 21, 101, false);
 
     assert(result == true, 'Student update failed');
 
-    let student1 = student_registry_dispatcher.get_student(account1);
+    let student1 = student_registry_dispatcher.get_student(0);
 
-    let (name, account, age, xp, active) = student1;
+    let (_id, name, account, age, xp, active) = student1;
 
     assert(name == 'Jane', 'Name was not set correctly');
     assert(account == account1, 'Account was not set correctly');

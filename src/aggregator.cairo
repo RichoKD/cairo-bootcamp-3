@@ -13,13 +13,19 @@ pub trait IAggregator<T> {
 
     // references Counter functions
     fn get_aggr_owner(self: @T) -> ContractAddress;
+
+    // references KillSwitch functions
+    fn get_kill_switch_owner(self: @T) -> ContractAddress;
+    fn set_kill_switch_is_on(ref self: T, _is_on: bool);
+    fn get_kill_switch_is_on(self: @T) -> bool;
 }
 
 #[starknet::contract]
 mod Aggregator {
     use cairo_bootcamp_3::{
         counter::{ICounterDispatcher, ICounterDispatcherTrait},
-        ownable::{IOwnableDispatcher, IOwnableDispatcherTrait}
+        ownable::{IOwnableDispatcher, IOwnableDispatcherTrait},
+        KillSwitch::{IKillSwitchDispatcher, IKillSwitchDispatcherTrait},
     };
     use super::{IAggregator};
     use starknet::{ContractAddress};
@@ -31,6 +37,7 @@ mod Aggregator {
         aggr_owner: ContractAddress,
         ownable_addr: ContractAddress,
         counter_addr: ContractAddress,
+        kill_switch_addr: ContractAddress,
     }
 
     #[constructor]
@@ -39,10 +46,12 @@ mod Aggregator {
         owner_addr: ContractAddress,
         ownable_addr: ContractAddress,
         counter_addr: ContractAddress,
+        kill_switch_addr: ContractAddress
     ) {
         self.aggr_owner.write(owner_addr);
         self.ownable_addr.write(ownable_addr);
         self.counter_addr.write(counter_addr);
+        self.kill_switch_addr.write(kill_switch_addr);
     }
 
     #[abi(embed_v0)]
@@ -63,12 +72,30 @@ mod Aggregator {
         }
 
         fn set_counter_count(ref self: ContractState, amount: u32) {
-            ICounterDispatcher { contract_address: self.counter_addr.read() }.set_count(amount);
+            if(self.get_kill_switch_is_on()) {
+                ICounterDispatcher { contract_address: self.counter_addr.read() }.set_count(amount);      
+            }else {
+                panic!("Kill switch is off");
+            }
         }
 
         fn get_aggr_owner(self: @ContractState) -> ContractAddress {
             self.aggr_owner.read()
         }
+
+        fn get_kill_switch_owner(self: @ContractState) -> ContractAddress {
+            IKillSwitchDispatcher { contract_address: self.kill_switch_addr.read() }.get_current_owner()
+        }
+
+        fn set_kill_switch_is_on(ref self: ContractState, _is_on: bool) {
+            IKillSwitchDispatcher { contract_address: self.kill_switch_addr.read() }.set_is_on(_is_on);
+        }
+
+        fn get_kill_switch_is_on(self: @ContractState) -> bool {
+            IKillSwitchDispatcher { contract_address: self.kill_switch_addr.read() }.get_is_on()
+        }
+
+
     }
 }
 // 0x1dd6e81d875e3451d14d418af0f42464bbaec19127465e700fb07cb403eb4cc - ca

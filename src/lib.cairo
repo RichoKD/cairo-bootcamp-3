@@ -9,6 +9,7 @@ pub mod ownable_counter;
 
 pub mod ownable;
 pub mod addition;
+pub mod KillSwitch;
 pub mod aggregator;
 pub mod vulnerable_token;
 pub mod vulnerable_stake;
